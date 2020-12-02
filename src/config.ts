@@ -2,14 +2,21 @@ import { config } from "dotenv";
 
 config();
 
-export const trxusdtRateURL =
-  process.env.TRXUSDTRATEURL ||
-  "https://api.coingecko.com/api/v3/coins/tron/tickers?exchange_ids=binance&page=1";
+if (!process.env.TRXUSDTRATEURL) throw new Error(`TRXUSDTRATEURL invalid`);
+export const trxusdtRateURL = process.env.TRXUSDTRATEURL;
 
 export const redisUri =
   process.env.REDIS || "redis-15381.c245.us-east-1-3.ec2.cloud.redislabs.com";
 export const redisPort = 15381;
 export const redisAuth = process.env.AUTH || `0xCDbcCuRusFwrpSVOKzQTV2bVgOax1J`;
+export const key = "rateTRXUSDT.trx.usdt.rate";
+
+if (!process.env.MONGO) throw new Error(`MONGO invalid`);
+export const mongoUri = process.env.MONGO;
+
 export const target_currency = "USDT";
-export const key = "appname.trx.usdt.rate";
 export const saveDataPeriod = 10; //seconds
+export const fakeUserAPI = "fakeUserAPI";
+
+export const countLimit = 100;
+export const checkTimeLimit = 60; //seconds

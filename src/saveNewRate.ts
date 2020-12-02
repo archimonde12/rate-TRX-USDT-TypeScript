@@ -9,12 +9,12 @@ export const saveNewRate = async () => {
     const { data } = await axios.get(url);
     data.tickers.forEach(async (value: any) => {
       if (value.target === target_currency) {
-        let saveData = {
+        const saveData = {
           rate: value.last,
           update_at: value.last_traded_at,
           create_at: now,
         };
-        let saveRes = await setAsync(key, JSON.stringify(saveData));
+        const saveRes = await setAsync(key, JSON.stringify(saveData));
         if (saveRes === "OK") {
           console.log("Update new TRX/USDT rate SUCCESSFUL");
         } else {
