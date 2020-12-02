@@ -1,6 +1,5 @@
-import { trxusdtRateURL, target_currency, key } from "./config";
-import axios from "axios";
-import { getAsync, setAsync } from "./redis";
+import { key } from "./config";
+import { getAsync } from "./redis";
 import { checkTimeFunc } from "./util";
 
 export const getRate = async (checkTime: number) => {
