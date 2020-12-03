@@ -36,21 +36,30 @@ const checkStatusByMongo = async () => {
       currentUserStatus.endSession = now + checkTimeLimit * 1000;
       currentUserStatus.status = "active";
       console.log(currentUserStatus);
-      await usersStatusCollection.findOneAndReplace(query, currentUserStatus);
+      const updateDocument = {
+        $set: {
+          count: 1,
+          status: "active",
+          endSession: now + checkTimeLimit * 1000,
+        },
+      };
+      await usersStatusCollection.findOneAndUpdate(query, updateDocument);
       return true;
     }
     if (isOutOfCount && !isOutOfTime) {
       console.log(`${fakeUserAPI} reach limit requests`);
       currentUserStatus.status = "inactive";
       console.log(currentUserStatus);
-      await usersStatusCollection.findOneAndReplace(query, currentUserStatus);
+      const updateDocument = { $set: { status: "inactive" } };
+      await usersStatusCollection.findOneAndUpdate(query, updateDocument);
       return false;
     }
     if (!isOutOfCount && !isOutOfTime) {
       currentUserStatus.count++;
       currentUserStatus.status = "active";
       console.log(currentUserStatus);
-      await usersStatusCollection.findOneAndReplace(query, currentUserStatus);
+      const updateDocument = { $inc: { count: 1 } };
+      await usersStatusCollection.findOneAndUpdate(query, updateDocument);
       return true;
     }
   } catch (e) {
@@ -118,7 +127,7 @@ export const getRate = async (checkTime: number) => {
     // let status = await checkStatusByMongo();
     let statusRedis = await checkUserStatusByRedis();
     console.log(statusRedis);
-    if (statusRedis.active) {
+    if (status) {
       let data = await getAsync(key);
       if (data) {
         let redisRes = JSON.parse(data);
