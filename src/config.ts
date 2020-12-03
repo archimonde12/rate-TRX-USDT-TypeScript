@@ -17,6 +17,7 @@ export const mongoUri = process.env.MONGO;
 export const target_currency = "USDT";
 export const saveDataPeriod = 10; //seconds
 export const fakeUserAPI = "fakeUserAPI";
+export const appName = "rateTRXUSDT";
 
 export const countLimit = 100;
 export const checkTimeLimit = 60; //seconds

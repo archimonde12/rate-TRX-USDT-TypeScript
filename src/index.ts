@@ -3,7 +3,7 @@ import typeDefs from "./schema";
 import resolvers from "./resolvers";
 import { redisAuth, redisPort, redisUri, saveDataPeriod } from "./config";
 import { connectRedis } from "./redis";
-import {connectMongo} from "./mongo"
+import { connectMongo } from "./mongo";
 import { saveNewRate } from "./saveNewRate";
 
 const start = async () => {
@@ -12,6 +12,9 @@ const start = async () => {
   const server = new ApolloServer({
     typeDefs,
     resolvers,
+    context: (req) => ({
+      ...req,
+    }),
   });
 
   server.listen().then(({ url }) => {

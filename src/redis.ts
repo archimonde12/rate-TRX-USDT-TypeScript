@@ -7,6 +7,7 @@ export let getKeys: (pattern: string) => Promise<string[]>;
 export let getAsync: (key: string) => Promise<string | null>;
 export let setAsync: (key: string, val: string) => Promise<any>;
 export let delAsync: (keys: string[]) => Promise<any>;
+export let incrAsync: (keys: string) => Promise<any>;
 
 const retry_delay = 1000;
 
@@ -31,6 +32,7 @@ export const connectRedis = async () =>
       getAsync = promisify(redis.get).bind(redis);
       setAsync = promisify(redis.set).bind(redis);
       delAsync = promisify(redis.del).bind(redis);
+      incrAsync = promisify(redis.incr).bind(redis);
 
       resolve();
     });

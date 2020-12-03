@@ -14,6 +14,7 @@
   "dependencies": {
     "@grpc/proto-loader": "^0.5.4",
     "@sentry/node": "^5.12.3",
+    "@supercharge/request-ip": "^1.1.2",
     "@types/redis": "^2.8.15",
     "apollo-server": "^2.19.0",
     "axios": "^0.19.2",
