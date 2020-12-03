@@ -6,7 +6,7 @@ import {
   appName,
 } from "./config";
 import { getAsync, setAsync, incrAsync } from "./redis";
-import { usersStatusCollection } from "./mongo";
+import { usersStatusCollection, mongoFindOne } from "./mongo";
 import { checkTimeFunc } from "./util";
 // falsy, truthy
 const checkStatusByMongo = async () => {
@@ -126,8 +126,7 @@ export const getRate = async (checkTime: number) => {
   try {
     // let status = await checkStatusByMongo();
     let statusRedis = await checkUserStatusByRedis();
-    console.log(statusRedis);
-    if (status) {
+    if (statusRedis.active) {
       let data = await getAsync(key);
       if (data) {
         let redisRes = JSON.parse(data);
