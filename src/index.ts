@@ -23,8 +23,8 @@ const start = async () => {
             Listening on ${url}
             Explore at https://studio.apollographql.com/dev
           `);
-    // saveNewRate();
-    // setInterval(() => saveNewRate(), saveDataPeriod * 1000);
+    saveNewRate();
+    setInterval(() => saveNewRate(), saveDataPeriod * 1000);
   });
 };
 

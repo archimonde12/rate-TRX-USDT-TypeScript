@@ -3,6 +3,7 @@ const { gql } = require("apollo-server");
 const typeDefs = gql`
   type Query {
     getTRXUSDTrate(checkTime: Int): checkResponse
+    user(userAPI: String): User
   }
 
   type checkResponse {
@@ -11,6 +12,11 @@ const typeDefs = gql`
     rate: Float
     update_at: String
     create_at: String
+  }
+
+  type User {
+    count: Int
+    status: String
   }
 `;
 
