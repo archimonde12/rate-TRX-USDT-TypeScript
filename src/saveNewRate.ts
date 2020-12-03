@@ -1,8 +1,8 @@
-import { trxusdtRateURL, target_currency, key } from "./config";
+import { trxusdtRateURL, target_currency, key, saveDataPeriod } from "./config";
 import axios from "axios";
 import { setAsync } from "./redis";
 
-export const saveNewRate = async () => {
+const saveNewRate = async () => {
   try {
     let now = new Date().toISOString();
     const url = trxusdtRateURL;
@@ -17,12 +17,21 @@ export const saveNewRate = async () => {
         const saveRes = await setAsync(key, JSON.stringify(saveData));
         if (saveRes === "OK") {
           console.log("Update new TRX/USDT rate SUCCESSFUL");
+          return true;
         } else {
           console.log("FAIL to update new rate ");
+          return false;
         }
       }
     });
   } catch (e) {
     throw e;
   }
+};
+
+export const routineUpdateNewRate = () => {
+  setTimeout(async () => {
+    await saveNewRate();
+    routineUpdateNewRate();
+  }, saveDataPeriod * 1000);
 };

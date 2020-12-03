@@ -4,7 +4,7 @@ import resolvers from "./resolvers";
 import { redisAuth, redisPort, redisUri, saveDataPeriod } from "./config";
 import { connectRedis } from "./redis";
 import { connectMongo } from "./mongo";
-import { saveNewRate } from "./saveNewRate";
+import { routineUpdateNewRate } from "./saveNewRate";
 
 const start = async () => {
   await connectRedis();
@@ -23,8 +23,7 @@ const start = async () => {
             Listening on ${url}
             Explore at https://studio.apollographql.com/dev
           `);
-    saveNewRate();
-    setInterval(() => saveNewRate(), saveDataPeriod * 1000);
+    routineUpdateNewRate();
   });
 };
 
