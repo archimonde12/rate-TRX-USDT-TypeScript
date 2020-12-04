@@ -7,7 +7,7 @@ export const trxusdtRateURL = process.env.TRXUSDTRATEURL;
 
 export const redisUri =
   process.env.REDIS || "redis-15381.c245.us-east-1-3.ec2.cloud.redislabs.com";
-export const redisPort = 15381;
+export const redisPort = 6379; //15381
 export const redisAuth = process.env.AUTH || `0xCDbcCuRusFwrpSVOKzQTV2bVgOax1J`;
 export const key = "rateTRXUSDT.trx.usdt.rate";
 

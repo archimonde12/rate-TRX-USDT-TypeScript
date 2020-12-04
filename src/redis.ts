@@ -19,11 +19,11 @@ export const connectRedis = async () =>
       no_ready_check: true,
     });
 
-    redis.auth(redisAuth, function (err, response) {
-      if (err) {
-        console.log("auth:", err);
-      }
-    });
+    // redis.auth(redisAuth, function (err, response) {
+    //   if (err) {
+    //     console.log("auth:", err);
+    //   }
+    // });
 
     redis.on("connect", () => {
       console.log("redis connected");

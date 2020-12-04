@@ -67,50 +67,88 @@ const checkStatusByMongo = async () => {
   }
 };
 
+// const checkUserStatusByRedis = async () => {
+//   try {
+//     const now: number = new Date().getTime();
+//     const safeTime: number =
+//       Math.round((checkTimeLimit / countLimit) * 1000) * 2;
+//     const countKey: string = `${appName}.${fakeUserAPI}.count`;
+//     const endSessionKey: string = `${appName}.${fakeUserAPI}.endSession`;
+//     const statusKey: string = `${appName}.${fakeUserAPI}.status`;
+//     let getStatusRes = await getAsync(statusKey);
+//     let getEndSessionRes = await getAsync(endSessionKey);
+
+//     const isOutOfTime: boolean = now > Number(getEndSessionRes);
+//     if (getStatusRes === "inactive" && !isOutOfTime) {
+//       return {
+//         count: countLimit,
+//         active: false,
+//       };
+//     }
+
+//     let getCountRes = await getAsync(countKey);
+//     if (!getCountRes || !getEndSessionRes || isOutOfTime) {
+//       await setAsync(countKey, "1");
+//       await setAsync(endSessionKey, `${now + checkTimeLimit * 1000}`);
+//       await setAsync(statusKey, "active");
+//       return {
+//         count: 1,
+//         active: true,
+//       };
+//     } else {
+//       const currentCount: number = Number(getCountRes) + 1;
+//       const isOutOfCount: boolean = currentCount >= countLimit;
+//       const timeRemain: number = Number(getEndSessionRes) - now;
+//       const timeSafeRemain: number =
+//         checkTimeLimit * 1000 - safeTime * currentCount;
+//       const isRequestOnSafeSpeed: boolean = timeRemain < timeSafeRemain;
+
+//       if (isOutOfCount && !isOutOfTime) {
+//         await setAsync(statusKey, "inactive");
+//         return {
+//           count: countLimit,
+//           active: false,
+//         };
+//       } else {
+//         await incrAsync(countKey);
+//         return {
+//           count: currentCount,
+//           active: true,
+//         };
+//       }
+//     }
+//   } catch (e) {
+//     throw e;
+//   }
+// };
+
 const checkUserStatusByRedis = async () => {
   try {
     const now: number = new Date().getTime();
-    const safeTime: number =
-      Math.round((checkTimeLimit / countLimit) * 1000) * 2;
+
     const countKey: string = `${appName}.${fakeUserAPI}.count`;
     const endSessionKey: string = `${appName}.${fakeUserAPI}.endSession`;
-    const statusKey: string = `${appName}.${fakeUserAPI}.status`;
-    let getStatusRes = await getAsync(statusKey);
+    await incrAsync(countKey);
     let getEndSessionRes = await getAsync(endSessionKey);
-
     const isOutOfTime: boolean = now > Number(getEndSessionRes);
-    if (getStatusRes === "inactive" && !isOutOfTime) {
-      return {
-        count: countLimit,
-        active: false,
-      };
-    }
-
     let getCountRes = await getAsync(countKey);
     if (!getCountRes || !getEndSessionRes || isOutOfTime) {
       await setAsync(countKey, "1");
       await setAsync(endSessionKey, `${now + checkTimeLimit * 1000}`);
-      await setAsync(statusKey, "active");
       return {
         count: 1,
         active: true,
       };
     } else {
-      const currentCount: number = Number(getCountRes) + 1;
-      const isOutOfCount: boolean = currentCount >= countLimit;
-      const timeRemain: number = Number(getEndSessionRes) - now;
-      const timeSafeRemain: number =
-        checkTimeLimit * 1000 - safeTime * currentCount;
-      const isRequestOnSafeSpeed: boolean = timeRemain < timeSafeRemain;
+      const currentCount: number = Number(getCountRes);
+      const isOutOfCount: boolean = currentCount > countLimit;
 
       if (isOutOfCount && !isOutOfTime) {
-        await setAsync(statusKey, "inactive");
         return {
           count: countLimit,
           active: false,
         };
       } else {
-        await incrAsync(countKey);
         return {
           count: currentCount,
           active: true,
@@ -135,7 +173,7 @@ export const getRate = async (checkTime: number) => {
         if (isCheckTimePass) {
           return {
             success: isCheckTimePass,
-            message: "Found lastest Data!",
+            message: "server response!",
             rate: redisRes.rate,
             update_at: redisRes.update_at,
             create_at: redisRes.create_at,
