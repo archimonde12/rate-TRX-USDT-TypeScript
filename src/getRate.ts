@@ -15,23 +15,12 @@ const limitApiCall = async () => {
     const currentCount = Number(getCountRes);
     if (currentCount === 1) {
       await expireAsync(countKey, checkTimeLimit);
-      return {
-        count: 1,
-        active: true,
-      };
-    } else {
-      if (currentCount > countLimit) {
-        return {
-          count: countLimit,
-          active: false,
-        };
-      } else {
-        return {
-          count: currentCount,
-          active: true,
-        };
-      }
+      return true;
     }
+    if (currentCount > countLimit) {
+      return false;
+    }
+    return true;
   } catch (e) {
     throw e;
   }
@@ -41,7 +30,7 @@ export const getRate = async (checkTime: number) => {
   try {
     // let status = await checkStatusByMongo();
     let status = await limitApiCall();
-    if (status.active) {
+    if (status) {
       let data = await getAsync(key);
       if (data) {
         let redisRes = JSON.parse(data);
@@ -64,10 +53,7 @@ export const getRate = async (checkTime: number) => {
     } else {
       return {
         success: false,
-        message:
-          status.count === 1
-            ? "Refresing ..."
-            : `Error 429:Out of limit  ${countLimit} requests per ${checkTimeLimit} seconds`,
+        message: `Error 429:Out of limit  ${countLimit} requests per ${checkTimeLimit} seconds`,
       };
     }
   } catch (e) {
