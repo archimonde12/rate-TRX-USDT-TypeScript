@@ -1,6 +1,7 @@
 const { getClientIp } = require("@supercharge/request-ip");
 
 import { getRate } from "./getRate";
+import { getAnyRate } from "./getAnyRate";
 import { getUser } from "./getUser";
 import { fakeUserAPI } from "./config";
 const resolver = {
@@ -13,6 +14,9 @@ const resolver = {
     user: (_: any, { userAPI = fakeUserAPI }, ctx: any) => {
       const ipAddress = getClientIp(ctx.req);
       return getUser(userAPI);
+    },
+    getRate: (_: any, { coin, currency }) => {
+      return getAnyRate(coin, currency);
     },
   },
 };
