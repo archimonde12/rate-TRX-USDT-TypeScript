@@ -67,7 +67,7 @@ export const getRate = async (checkTime: number) => {
         message:
           status.count === 1
             ? "Refresing ..."
-            : `Out of limit  ${countLimit} requests per ${checkTimeLimit} seconds. Please wait ${checkTimeLimit} seconds more for new request`,
+            : `Error 429:Out of limit  ${countLimit} requests per ${checkTimeLimit} seconds`,
       };
     }
   } catch (e) {
