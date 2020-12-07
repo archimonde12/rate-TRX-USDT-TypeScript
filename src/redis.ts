@@ -7,8 +7,20 @@ export let getKeys: (pattern: string) => Promise<string[]>;
 export let getAsync: (key: string) => Promise<string | null>;
 export let setAsync: (key: string, val: string) => Promise<any>;
 export let delAsync: (keys: string[]) => Promise<any>;
-export let incrAsync: (keys: string) => Promise<any>;
-
+export let incrAsync: (key: string) => Promise<any>;
+export let decrAsync: (key: string) => Promise<any>;
+export let rpushAsync: (key: string, val: string) => Promise<number>;
+export let ltrimAsync: (
+  key: string,
+  start: number,
+  stop: number
+) => Promise<any>;
+export let lrangeAsync: (
+  key: string,
+  start: number,
+  stop: number
+) => Promise<any>;
+export let expireAsync: (key: string, seconds: number) => Promise<any>;
 const retry_delay = 1000;
 
 export const connectRedis = async () =>
@@ -19,11 +31,11 @@ export const connectRedis = async () =>
       no_ready_check: true,
     });
 
-    // redis.auth(redisAuth, function (err, response) {
-    //   if (err) {
-    //     console.log("auth:", err);
-    //   }
-    // });
+    redis.auth(redisAuth, function (err, response) {
+      if (err) {
+        console.log("auth:", err);
+      }
+    });
 
     redis.on("connect", () => {
       console.log("redis connected");
@@ -33,7 +45,11 @@ export const connectRedis = async () =>
       setAsync = promisify(redis.set).bind(redis);
       delAsync = promisify(redis.del).bind(redis);
       incrAsync = promisify(redis.incr).bind(redis);
-
+      decrAsync = promisify(redis.decr).bind(redis);
+      rpushAsync = promisify(redis.rpush).bind(redis);
+      ltrimAsync = promisify(redis.ltrim).bind(redis);
+      lrangeAsync = promisify(redis.lrange).bind(redis);
+      expireAsync = promisify(redis.expire).bind(redis);
       resolve();
     });
 

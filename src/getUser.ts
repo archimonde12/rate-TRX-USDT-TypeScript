@@ -1,12 +1,15 @@
 import { getAsync } from "./redis";
-import { fakeUserAPI, appName, countLimit } from "./config";
+import { fakeUserAPI, appName, countLimit, checkTimeLimit } from "./config";
 
 export const getUser = async (userAPI: string) => {
+  const now: number = new Date().getTime();
   const countKey: string = `${appName}.${userAPI}.count`;
-  const statusKey: string = `${appName}.${userAPI}.status`;
+  const endSessionKey: string = `${appName}.${fakeUserAPI}.endSession`;
   const countRes = await getAsync(countKey);
+  const endSessionRes = await getAsync(endSessionKey);
+  const isOutOfCount: boolean = Number(countRes) > countLimit;
   return {
-    count: Number(countRes) >= countLimit ? countLimit : Number(countRes),
-    status: Number(countRes) >= countLimit ? "inactive" : "active",
+    count: Number(countRes),
+    status: isOutOfCount ? "inactive" : "active",
   };
 };

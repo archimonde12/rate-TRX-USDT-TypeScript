@@ -1,7 +1,6 @@
 import { ApolloServer } from "apollo-server";
 import typeDefs from "./schema";
 import resolvers from "./resolvers";
-import { redisAuth, redisPort, redisUri, saveDataPeriod } from "./config";
 import { connectRedis } from "./redis";
 import { connectMongo } from "./mongo";
 import { routineUpdateNewRate } from "./saveNewRate";
