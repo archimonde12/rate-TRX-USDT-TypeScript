@@ -9,6 +9,9 @@ export const redisUri =
   process.env.REDIS || "redis-15381.c245.us-east-1-3.ec2.cloud.redislabs.com";
 export const redisPort = 15381; //cloud:15381 //local:6379
 export const redisAuth = process.env.AUTH || `0xCDbcCuRusFwrpSVOKzQTV2bVgOax1J`;
+if (!process.env.REDISLOCAL) throw new Error(`REDISLOCAL invalid`);
+export const redisLocalUri = process.env.REDISLOCAL;
+export const redisLocalPort = 6379;
 export const key = "rateTRXUSDT.trx.usdt.rate";
 
 if (!process.env.MONGO) throw new Error(`MONGO invalid`);

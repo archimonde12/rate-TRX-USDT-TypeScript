@@ -21,6 +21,13 @@ export let lrangeAsync: (
   stop: number
 ) => Promise<any>;
 export let expireAsync: (key: string, seconds: number) => Promise<any>;
+export let setExpireAsync: (
+  key: string,
+  seconds: number,
+  val: string
+) => Promise<any>;
+export let ttlAsync: (key: string) => Promise<number>;
+export let multiAsync;
 const retry_delay = 1000;
 
 export const connectRedis = async () =>
@@ -50,6 +57,9 @@ export const connectRedis = async () =>
       ltrimAsync = promisify(redis.ltrim).bind(redis);
       lrangeAsync = promisify(redis.lrange).bind(redis);
       expireAsync = promisify(redis.expire).bind(redis);
+      setExpireAsync = promisify(redis.setex).bind(redis);
+      ttlAsync = promisify(redis.ttl).bind(redis);
+      multiAsync = redis.multi();
       resolve();
     });
 
