@@ -12,11 +12,18 @@ const typeDefs = gql`
     rate: Float
     update_at: String
     create_at: String
+    count: Int
+    remain: Int
+    reactiveAt: Int
+    code: String
   }
 
   type User {
+    code: String
     count: Int
     status: String
+    remain: Int
+    reactiveAt: Int
   }
 `;
 

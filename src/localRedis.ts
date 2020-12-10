@@ -11,6 +11,7 @@ export let setExpireAsyncLocal: (
   seconds: number,
   val: string
 ) => Promise<any>;
+
 export let existAsyncLocal: (key: string) => Promise<any>;
 const retry_delay = 1000;
 

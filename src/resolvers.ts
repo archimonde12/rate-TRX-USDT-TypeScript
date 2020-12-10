@@ -5,10 +5,13 @@ import { getUser } from "./getUser";
 import { fakeUserAPI } from "./config";
 const resolver = {
   Query: {
-    getTRXUSDTrate: (_: any, { checkTime = 10 }, ctx: any) => {
+    getTRXUSDTrate: async (_: any, { checkTime = 10 }, ctx: any) => {
       const ipAddress = getClientIp(ctx.req);
       console.log(ipAddress, " request get rate!");
-      return getRate(checkTime);
+      let rate = await getRate(checkTime);
+      let userStatus = await getUser(fakeUserAPI);
+      let result = { ...rate, ...userStatus };
+      return result;
     },
     user: (_: any, { userAPI = fakeUserAPI }, ctx: any) => {
       const ipAddress = getClientIp(ctx.req);
