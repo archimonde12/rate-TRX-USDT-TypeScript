@@ -18,7 +18,10 @@ import {
 } from "./redis";
 import { existAsyncLocal, setExpireAsyncLocal } from "./localRedis";
 import { checkTimeFunc } from "./util";
-import { checkFlag, checkLocalFlag } from "./checkFlag";
+import {
+  checkFlagByLocalRedis,
+  checkFlagByLocalVarAndCloudRedis,
+} from "./checkFlag";
 import { allKeysCache } from "./scanAllCountKeys";
 
 export let tempApiStatus: any[] = [];
@@ -90,14 +93,62 @@ const checkLocal = (api: string) => {
     return result;
   }
 };
-//Phương án khác
+// Phương án khác
+export const getRate = async (checkTime: number) => {
+  try {
+    const countKey: string = `${appName}.${fakeUserAPI}.count`;
+    let flag: boolean = await checkFlagByLocalVarAndCloudRedis(fakeUserAPI);
+
+    if (!flag) {
+      return {
+        success: false,
+        message: `Error 429:Out of limit  ${countLimit} requests per ${checkTimeLimit} seconds`,
+      };
+    }
+    let status: boolean = await limitApiCall();
+    if (status) {
+      let data = await getAsync(key);
+      if (data) {
+        let redisRes = JSON.parse(data);
+        let updateAtTime = new Date(redisRes.update_at).getTime();
+        let isCheckTimePass = checkTimeFunc(updateAtTime, checkTime);
+        if (isCheckTimePass) {
+          return {
+            success: isCheckTimePass,
+            message: "server response!",
+            rate: redisRes.rate,
+            update_at: redisRes.update_at,
+            create_at: redisRes.create_at,
+          };
+        }
+        return {
+          success: isCheckTimePass,
+          message: "Data were expired! Waitting for new data",
+        };
+      }
+    } else {
+      const lifeTimeOfKey: number = await ttlAsync(countKey);
+      setExpireAsyncLocal(countKey, lifeTimeOfKey, "1");
+      return {
+        success: false,
+        message: `Error 429:Out of limit  ${countLimit} requests per ${checkTimeLimit} seconds`,
+      };
+    }
+  } catch (e) {
+    return {
+      success: false,
+      message: e,
+    };
+  }
+};
+
+//Dùng chỉ local var
 // export const getRate = async (checkTime: number) => {
 //   try {
 //     const countKey: string = `${appName}.${fakeUserAPI}.count`;
-//     // console.log(checkLocal(fakeUserAPI));
-//     let flag: boolean = await checkFlag(fakeUserAPI);
-
-//     if (!flag) {
+//     let check = checkLocal(fakeUserAPI);
+//     console.log(check);
+//     if (!check.active) {
 //       return {
 //         success: false,
 //         message: `Error 429:Out of limit  ${countLimit} requests per ${checkTimeLimit} seconds`,
@@ -139,51 +190,3 @@ const checkLocal = (api: string) => {
 //     };
 //   }
 // };
-//Dùng local
-export const getRate = async (checkTime: number) => {
-  try {
-    const countKey: string = `${appName}.${fakeUserAPI}.count`;
-    let check = checkLocal(fakeUserAPI);
-    console.log(check);
-    if (!check.active) {
-      return {
-        success: false,
-        message: `Error 429:Out of limit  ${countLimit} requests per ${checkTimeLimit} seconds`,
-      };
-    }
-    let status: boolean = await limitApiCall();
-    if (status) {
-      let data = await getAsync(countKey);
-      if (data) {
-        let redisRes = JSON.parse(data);
-        let updateAtTime = new Date(redisRes.update_at).getTime();
-        let isCheckTimePass = checkTimeFunc(updateAtTime, checkTime);
-        if (isCheckTimePass) {
-          return {
-            success: isCheckTimePass,
-            message: "server response!",
-            rate: redisRes.rate,
-            update_at: redisRes.update_at,
-            create_at: redisRes.create_at,
-          };
-        }
-        return {
-          success: isCheckTimePass,
-          message: "Data were expired! Waitting for new data",
-        };
-      }
-    } else {
-      const lifeTimeOfKey: number = await ttlAsync(countKey);
-      setExpireAsyncLocal(countKey, lifeTimeOfKey, "1");
-      return {
-        success: false,
-        message: `Error 429:Out of limit  ${countLimit} requests per ${checkTimeLimit} seconds`,
-      };
-    }
-  } catch (e) {
-    return {
-      success: false,
-      message: e,
-    };
-  }
-};

@@ -2,7 +2,7 @@ import { appName } from "./config";
 import { existAsyncLocal } from "./localRedis";
 import { allKeysCache } from "./scanAllCountKeys";
 
-export const checkFlag = async (userAPI: string) => {
+export const checkFlagByLocalRedis = async (userAPI: string) => {
   try {
     const key: string = `${appName}.${userAPI}.count`;
     let isExist = await existAsyncLocal(key);
@@ -15,7 +15,7 @@ export const checkFlag = async (userAPI: string) => {
   }
 };
 
-export const checkLocalFlag = (userAPI: string) => {
+export const checkFlagByLocalVarAndCloudRedis = (userAPI: string) => {
   const countKey: string = `${appName}.${userAPI}.count`;
   const statusKey: string = `${appName}.${userAPI}.status`;
   const { allCountKeys, allStatusKeys } = allKeysCache;
