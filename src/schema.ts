@@ -25,6 +25,15 @@ const typeDefs = gql`
     remain: Int
     reactiveAt: Int
   }
+
+  type Subscription {
+    countNotification: Message
+  }
+
+  type Message {
+    id: String
+    text: String
+  }
 `;
 
 export default typeDefs;
