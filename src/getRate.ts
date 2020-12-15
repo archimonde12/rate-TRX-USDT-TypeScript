@@ -59,7 +59,12 @@ const checkLocal = (api: string) => {
   //Problem: When restart it disappear
   //Check is api exist in local
   let index = tempApiStatus.findIndex(({ apiKey }) => apiKey === api);
-  let result: any;
+  let result: {
+    apiKey: string;
+    count: number;
+    expireAt: number;
+    active: boolean;
+  };
   //If exist
   if (index > -1) {
     let now = new Date().getTime() / 1000; //Convert to seconds
@@ -94,62 +99,85 @@ const checkLocal = (api: string) => {
     return result;
   }
 };
-// Phương án khác
-// export const getRate = async (checkTime: number) => {
-//   try {
-//     const countKey: string = `${appName}.${fakeUserAPI}.count`;
-//     let flag: boolean = await checkFlagByLocalRedis(fakeUserAPI);
-
-//     if (!flag) {
-//       return {
-//         success: false,
-//         message: `Error 429:Out of limit  ${countLimit} requests per ${checkTimeLimit} seconds`,
-//       };
-//     }
-//     let status: boolean = await limitApiCall();
-//     if (status) {
-//       let data = await getAsync(key);
-//       if (data) {
-//         let redisRes = JSON.parse(data);
-//         let updateAtTime = new Date(redisRes.update_at).getTime();
-//         let isCheckTimePass = checkTimeFunc(updateAtTime, checkTime);
-//         if (isCheckTimePass) {
-//           return {
-//             success: isCheckTimePass,
-//             message: "server response!",
-//             rate: redisRes.rate,
-//             update_at: redisRes.update_at,
-//             create_at: redisRes.create_at,
-//           };
-//         }
-//         return {
-//           success: isCheckTimePass,
-//           message: "Data were expired! Waitting for new data",
-//         };
-//       }
-//     } else {
-//       const lifeTimeOfKey: number = await ttlAsync(countKey);
-//       setExpireAsyncLocal(countKey, lifeTimeOfKey, "1");
-//       return {
-//         success: false,
-//         message: `Error 429:Out of limit  ${countLimit} requests per ${checkTimeLimit} seconds`,
-//       };
-//     }
-//   } catch (e) {
-//     return {
-//       success: false,
-//       message: e,
-//     };
-//   }
-// };
 
 //Dùng chỉ local var
 export const getRate = async (checkTime: number) => {
   try {
     const countKey: string = `${appName}.${fakeUserAPI}.count`;
-    let check = checkLocal(fakeUserAPI);
+    let check: {
+      apiKey: string;
+      count: number;
+      expireAt: number;
+      active: boolean;
+    } = checkLocal(fakeUserAPI);
     console.log(check);
     if (!check.active) {
+      return {
+        success: false,
+        message: `Error 429:Out of limit  ${countLimit} requests per ${checkTimeLimit} seconds`,
+        count: check.count,
+        rate: countLimit,
+        update_at: null,
+        create_at: null,
+      };
+    }
+    let status: boolean = await limitApiCall();
+    if (status) {
+      let data = await getAsync(key);
+      if (data) {
+        let redisRes = JSON.parse(data);
+        let updateAtTime = new Date(redisRes.update_at).getTime();
+        let isCheckTimePass = checkTimeFunc(updateAtTime, checkTime);
+        if (isCheckTimePass) {
+          return {
+            success: isCheckTimePass,
+            message: "server response!",
+            rate: redisRes.rate,
+            update_at: redisRes.update_at,
+            create_at: redisRes.create_at,
+            count: check.count,
+          };
+        }
+        return {
+          success: isCheckTimePass,
+          message: "Data were expired! Waitting for new data",
+          count: check.count,
+          rate: null,
+          update_at: null,
+          create_at: null,
+        };
+      }
+    } else {
+      const lifeTimeOfKey: number = await ttlAsync(countKey);
+      setExpireAsyncLocal(countKey, lifeTimeOfKey, "1");
+      return {
+        success: false,
+        message: `Error 429:Out of limit  ${countLimit} requests per ${checkTimeLimit} seconds`,
+        count: check.count,
+        rate: null,
+        update_at: null,
+        create_at: null,
+      };
+    }
+  } catch (e) {
+    return {
+      success: false,
+      message: e,
+      count: 0,
+      rate: null,
+      update_at: null,
+      create_at: null,
+    };
+  }
+};
+
+// Phương án khác
+export const getRate2 = async (checkTime: number) => {
+  try {
+    const countKey: string = `${appName}.${fakeUserAPI}.count`;
+    let flag: boolean = await checkFlagByLocalRedis(fakeUserAPI);
+
+    if (!flag) {
       return {
         success: false,
         message: `Error 429:Out of limit  ${countLimit} requests per ${checkTimeLimit} seconds`,
