@@ -1,0 +1,7 @@
+#circle {
+  background-color: gray;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+}
