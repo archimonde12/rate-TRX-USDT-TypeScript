@@ -6,10 +6,13 @@ import { checkTimeLimit, countLimit, fakeUserAPI } from "./config";
 import { createExpireTime } from "./util";
 
 import { PubSub, withFilter } from "apollo-server";
+import { lock, setLock } from "./lockServer";
 const pubsub = new PubSub();
 const TEST = "TEST";
 let flagFirstTimeCount = false;
 let flagCountLimit = false;
+let countRequest = 0;
+const delayAsync=(ms:number)=>new Promise(res=>setTimeout(res,ms))
 
 const resolver = {
   Query: {
@@ -57,6 +60,20 @@ const resolver = {
       const ipAddress = getClientIp(ctx.req);
       return getUser(userAPI);
     },
+    testRequest: async () => {
+      countRequest++
+      await delayAsync(countRequest*100)
+      countRequest--
+      if (!lock) {
+        return "Response";
+      } else {
+        return "Server Locked"
+      };
+    },
+    setLockServer:(_:any,{isLock})=>{
+      setLock(isLock)
+      return `lock = ${isLock}`
+    }
   },
   Subscription: {
     countNotification: {

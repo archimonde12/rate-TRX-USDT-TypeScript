@@ -31,7 +31,7 @@ export let multiAsync;
 const retry_delay = 1000;
 
 export const connectRedis = async () =>
-  new Promise((resolve, reject) => {
+  new Promise<void>((resolve, reject) => {
     redis = createClient({
       host: redisUri,
       port: redisPort,

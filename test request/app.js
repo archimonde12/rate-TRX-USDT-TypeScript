@@ -4,33 +4,35 @@ let start = document.getElementById("start");
 let stop = document.getElementById("stop");
 let send = document.getElementById("send");
 let circle = document.getElementById("circle");
+let numberRequest= document.getElementById("numberRequest");
+let numberResponse= document.getElementById("numberResponse");
 let request_number_value = document.getElementById("request_number_value");
 let fixed_send = document.getElementById("fixed_send");
+let totalRequest=0;
 let totalResponse = 0;
 
 const sendRequestToServer = async () => {
+  totalRequest++
+  numberRequest.innerHTML=totalRequest
   let res = await fetch(GRAPHQL_URL, {
     method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify({
       query: `
-      query {
-        getTRXUSDTrate{
-        success
-        message
-        rate
-        update_at
-        create_at
-        }
-    }`,
+      query{
+        testRequest
+      }
+    `,
     }),
   });
-
   const { data } = await res.json();
-  if (data.getTRXUSDTrate.message === "server response!") {
+  if (data.testRequest === "Response") {
     totalResponse++;
   }
-  console.log(totalResponse);
+
+  numberResponse.innerHTML=totalResponse
+
+  console.log(data);
   return data;
 };
 

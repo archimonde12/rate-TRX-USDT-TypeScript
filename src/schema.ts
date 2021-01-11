@@ -4,6 +4,8 @@ const typeDefs = gql`
   type Query {
     getTRXUSDTrate(checkTime: Int): getRateResponse
     user(userAPI: String): User
+    testRequest: String
+    setLockServer(isLock:Boolean!):String
   }
 
   type getRateResponse {

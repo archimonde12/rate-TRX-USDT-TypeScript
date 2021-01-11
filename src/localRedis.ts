@@ -1,3 +1,4 @@
+import { VariableNode } from "graphql";
 import { createClient, RedisClient } from "redis";
 import { promisify } from "util";
 import { redisLocalPort, redisLocalUri } from "./config";
@@ -16,7 +17,7 @@ export let existAsyncLocal: (key: string) => Promise<any>;
 const retry_delay = 1000;
 
 export const connectLocalRedis = async () =>
-  new Promise((resolve, reject) => {
+  new Promise<void>((resolve, reject) => {
     localRedis = createClient({
       host: redisLocalUri,
       port: redisLocalPort,
